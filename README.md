@@ -1,4 +1,4 @@
-# 🏓 Tischtennis Tracker v2
+# 🏓 King Tracker
 
 Modern Microsoft Fluent Design style Tischtennis game tracker with real-time data persistence to Supabase.
 

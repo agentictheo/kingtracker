@@ -94,7 +94,7 @@ export default function App() {
       {/* Header */}
       <header className="header">
         <div className="header-content">
-          <h1 className="header-title">🏓 Tischtennis Tracker</h1>
+          <h1 className="header-title">👑 King Tracker</h1>
           <button
             className="dark-mode-btn"
             onClick={() => setDarkMode(!darkMode)}
