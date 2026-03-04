@@ -1,14 +1,454 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/kingtracker/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>tischtennis-tracker-new</title>
-    <script type="module" crossorigin src="/kingtracker/assets/index-D_u0r21O.js"></script>
-    <link rel="stylesheet" crossorigin href="/kingtracker/assets/index-aMHaL6vS.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👑 King Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            color: #333;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        body.dark {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            color: #f0f0f0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0078d4 0%, #0063b1 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .toggle-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        body.dark .card {
+            background: #2a2a2a;
+            border-color: #444;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: #0078d4;
+            border-bottom: 2px solid #0078d4;
+            padding-bottom: 8px;
+        }
+
+        body.dark .card h2 {
+            color: #4da6ff;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        input {
+            padding: 12px;
+            border: 1px solid #d0d0d0;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: inherit;
+            background: white;
+            color: #333;
+        }
+
+        body.dark input {
+            background: #3a3a3a;
+            border-color: #555;
+            color: #f0f0f0;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 0 3px rgba(0,120,212,0.1);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #0078d4;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0063b1;
+        }
+
+        .btn-delete {
+            background: transparent;
+            color: #d32f2f;
+            border: none;
+            font-size: 24px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background: rgba(211,47,47,0.1);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: linear-gradient(135deg, #0078d4 0%, #0063b1 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .stat h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .big-number {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .games {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .game {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f9f9f9;
+            border-left: 4px solid #0078d4;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        body.dark .game {
+            background: #3a3a3a;
+            border-color: #555;
+        }
+
+        .game-info {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge-green {
+            background: #107c10;
+        }
+
+        .badge-blue {
+            background: #0078d4;
+        }
+
+        .score {
+            font-size: 16px;
+            font-weight: 700;
+            min-width: 50px;
+        }
+
+        .date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        body.dark .date {
+            color: #aaa;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 24px;
+            color: #999;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            border-left: 4px solid #d32f2f;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .game {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .game-info {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .big-number {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👑 King Tracker</h1>
+        <button class="toggle-btn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+
+    <div class="container">
+        <div id="error" class="error" style="display:none;"></div>
+
+        <div class="card">
+            <h2>Neues Spiel</h2>
+            <div class="form-group">
+                <input type="number" id="score1" placeholder="Nicola Punkte" min="0" max="20">
+                <input type="number" id="score2" placeholder="Janis Punkte" min="0" max="20">
+                <button class="btn btn-primary" onclick="addGame()">➕ Spiel hinzufügen</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <h3>Nicola</h3>
+                <div class="big-number" id="nicolaWins">0</div>
+            </div>
+            <div class="stat">
+                <h3>Janis</h3>
+                <div class="big-number" id="janisWins">0</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Spielverlauf</h2>
+            <div class="games" id="gamesList">
+                <div class="empty">Laden...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://iqfxysimszpncgxuaezn.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxZnh5c2ltc3pwbmNneHVhZXpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk1NzQzNTAsImV4cCI6MjAyNTE0NDM1MH0.nOLZfWMSuH27q8Y_w5g8_kPVLVzs3x47yVxJvV0U0Wk';
+
+        let games = [];
+        let darkMode = false;
+
+        async function loadGames() {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/tischtennis_games?order=created_at.desc`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                games = await res.json();
+                renderGames();
+                updateStats();
+            } catch (err) {
+                console.error('Load error:', err);
+                showError('Fehler beim Laden');
+                document.getElementById('gamesList').innerHTML = '<div class="empty">Fehler beim Laden der Spiele</div>';
+            }
+        }
+
+        async function addGame() {
+            const s1 = parseInt(document.getElementById('score1').value);
+            const s2 = parseInt(document.getElementById('score2').value);
+
+            if (!s1 || !s2 || s1 === s2) {
+                showError('Beide Scores eingeben (keine Unentschieden)!');
+                return;
+            }
+
+            const winner = s1 > s2 ? 'Nicola' : 'Janis';
+
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/tischtennis_games`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        player1: 'Nicola',
+                        player2: 'Janis',
+                        score1: s1,
+                        score2: s2,
+                        winner,
+                        created_at: new Date().toISOString()
+                    })
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                
+                document.getElementById('score1').value = '';
+                document.getElementById('score2').value = '';
+                loadGames();
+            } catch (err) {
+                console.error('Add error:', err);
+                showError('Fehler beim Hinzufügen');
+            }
+        }
+
+        async function deleteGame(id) {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/tischtennis_games?id=eq.${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                loadGames();
+            } catch (err) {
+                console.error('Delete error:', err);
+                showError('Fehler beim Löschen');
+            }
+        }
+
+        function renderGames() {
+            const list = document.getElementById('gamesList');
+            if (games.length === 0) {
+                list.innerHTML = '<div class="empty">Noch keine Spiele</div>';
+                return;
+            }
+
+            list.innerHTML = games.map(g => `
+                <div class="game">
+                    <div class="game-info">
+                        <span class="badge ${g.winner === 'Nicola' ? 'badge-green' : 'badge-blue'}">
+                            ${g.winner} gewinnt
+                        </span>
+                        <span class="score">${g.score1}:${g.score2}</span>
+                        <span class="date">${new Date(g.created_at).toLocaleDateString('de-DE')}</span>
+                    </div>
+                    <button class="btn-delete" onclick="deleteGame(${g.id})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            const nicola = games.filter(g => g.winner === 'Nicola').length;
+            const janis = games.filter(g => g.winner === 'Janis').length;
+            document.getElementById('nicolaWins').textContent = nicola;
+            document.getElementById('janisWins').textContent = janis;
+        }
+
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            document.body.classList.toggle('dark');
+            localStorage.setItem('darkMode', darkMode);
+        }
+
+        function showError(msg) {
+            const err = document.getElementById('error');
+            err.textContent = msg;
+            err.style.display = 'block';
+            setTimeout(() => err.style.display = 'none', 4000);
+        }
+
+        // Init
+        if (localStorage.getItem('darkMode') === 'true') {
+            toggleDarkMode();
+        }
+        loadGames();
+    </script>
+</body>
 </html>
